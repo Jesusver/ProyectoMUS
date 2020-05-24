@@ -10,7 +10,6 @@ import android.util.Pair;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class MainActivity extends Activity {
