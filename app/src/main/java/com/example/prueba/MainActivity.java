@@ -184,6 +184,7 @@ public class MainActivity extends Activity {
             }
         });
         thread.start();
+
     }
 
     void genTone(){
@@ -216,6 +217,26 @@ public class MainActivity extends Activity {
                 AudioTrack.MODE_STATIC);
         audioTrack.write(generatedSnd, 0, generatedSnd.length);
         audioTrack.play();
+        audioTrack.setNotificationMarkerPosition(duration * sampleRate);
+        audioTrack.setNotificationMarkerPosition(audioTrack.getPlaybackHeadPosition() + (duration * sampleRate));
+        audioTrack.setPlaybackPositionUpdateListener(new AudioTrack.OnPlaybackPositionUpdateListener(){
+
+            @Override
+            public void onMarkerReached(AudioTrack arg0) {
+                audioTrack.release();
+
+            }
+
+            @Override
+            public void onPeriodicNotification(AudioTrack arg0) {
+
+            }
+
+        }
+        );
+
+        //while(audioTrack.getPlayState() != AudioTrack.PLAYSTATE_STOPPED) {}
+
     }
 
     private float[] env(){
