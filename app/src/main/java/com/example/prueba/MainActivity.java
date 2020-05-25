@@ -90,8 +90,7 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
                 ((TextView)findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
-                puntosEnvolvente.remove(1);
-                puntosEnvolvente.add(1, new Pair<>(progress, new Float(0.9)));
+
             }
 
             @Override
@@ -99,7 +98,12 @@ public class MainActivity extends Activity {
 
             @Override
             public void onStopTrackingTouch(CircularSeekBar seekBar) {
-                seekBarDecay.setMin(seekBar.getProgress(), seekBarDecay.getProgress());
+                if (seekBarDecay.setMin(seekBar.getProgress(), seekBarDecay.getProgress())){
+                    puntosEnvolvente.remove(2);
+                    puntosEnvolvente.add(2, new Pair<>(seekBarDecay.getProgress(), new Float(0.9)));
+                }
+                puntosEnvolvente.remove(1);
+                puntosEnvolvente.add(1, new Pair<>(seekBar.getProgress(), new Float(0.9)));
 
             }
         });
@@ -121,8 +125,7 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
                 ((TextView)findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
-                puntosEnvolvente.remove(2);
-                puntosEnvolvente.add(2, new Pair<>(progress, new Float(0.3)));
+
 
             }
 
@@ -131,7 +134,12 @@ public class MainActivity extends Activity {
 
             @Override
             public void onStopTrackingTouch(CircularSeekBar seekBar) {
-                seekBarSustain.setMin(seekBar.getProgress(), seekBarSustain.getProgress());
+                if (seekBarSustain.setMin(seekBar.getProgress(), seekBarSustain.getProgress())){
+                    puntosEnvolvente.remove(3);
+                    puntosEnvolvente.add(3, new Pair<>(seekBarSustain.getProgress(), new Float(0.2)));
+                }
+                puntosEnvolvente.remove(2);
+                puntosEnvolvente.add(2, new Pair<>(seekBar.getProgress(), new Float(0.3)));
 
             }
         });
@@ -152,8 +160,7 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
                 ((TextView)findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
-                puntosEnvolvente.remove(3);
-                puntosEnvolvente.add(3, new Pair<>(progress, new Float(0.2)));
+
 
             }
 
@@ -162,7 +169,12 @@ public class MainActivity extends Activity {
 
             @Override
             public void onStopTrackingTouch(CircularSeekBar seekBar) {
-                seekBarRelease.setMin(seekBar.getProgress(), seekBarRelease.getProgress());
+                if (seekBarRelease.setMin(seekBar.getProgress(), seekBarRelease.getProgress())){
+                    puntosEnvolvente.remove(4);
+                    puntosEnvolvente.add(4, new Pair<>(seekBarRelease.getProgress(), new Float(0.0)));
+                }
+                puntosEnvolvente.remove(3);
+                puntosEnvolvente.add(3, new Pair<>(seekBar.getProgress(), new Float(0.2)));
             }
         });
     }
@@ -185,8 +197,7 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
                 ((TextView)findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
-                puntosEnvolvente.remove(4);
-                puntosEnvolvente.add(4, new Pair<>(progress, new Float(0.0)));
+
 
             }
 
@@ -197,7 +208,8 @@ public class MainActivity extends Activity {
 
             @Override
             public void onStopTrackingTouch(CircularSeekBar seekBar) {
-
+                puntosEnvolvente.remove(4);
+                puntosEnvolvente.add(4, new Pair<>(seekBar.getProgress(), new Float(0.0)));
             }
         });
     }

@@ -20,9 +20,11 @@ public class CircularSeekBarPropia extends CircularSeekBar {
         super(context, attrs, defStyleAttr);
     }
 
-    public void setMin(float min, float progreso) {
+    public boolean setMin(float min, float progreso) {
         super.setMin(min);
         super.setProgress(Math.max(min,progreso));
-
+        if (this.getProgress()!=progreso)
+            return true;
+        return false;
     }
 }
