@@ -42,16 +42,16 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:divider="@drawable/divisor_botones"
         android:orientation="vertical"
         android:showDividers="middle|beginning|end"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.70">
+        app:layout_constraintTop_toBottomOf="@+id/LinearDesplegableOctavas"
+        android:layout_marginTop="50dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -184,6 +184,100 @@
                 android:layout_weight="1"
                 android:text="Si" />
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
+        android:showDividers="middle"
+        android:divider="@drawable/divisor_ruedas"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        <com.akaita.android.circularseekbar.CircularSeekBar
+            android:layout_width="90dp"
+            android:layout_height="100dp"
+            android:id="@+id/seekbarAttack"
+            app:enabled="true"
+            app:innerCircleColor="#e0f7e9"
+            app:min="0"
+            app:max="1"
+            app:progress="0"
+            app:progressTextColor="@android:color/black"
+            app:progressTextSize="10"
+            app:ringColor="@color/colorAccent"
+            app:ringWidth="0.7"
+            app:showIndicator="true"
+            app:showInnerCircle="true"
+            app:showProgressText="true"
+            app:speedMultiplier="2">
+
+        </com.akaita.android.circularseekbar.CircularSeekBar>
+
+        <com.akaita.android.circularseekbar.CircularSeekBar
+            android:layout_width="90dp"
+            android:layout_height="100dp"
+            android:id="@+id/seekbarDecay"
+            app:enabled="true"
+            app:innerCircleColor="#e0f7e9"
+            app:min="0"
+            app:max="100"
+            app:progress="15"
+            app:progressTextColor="@android:color/black"
+            app:progressTextSize="15"
+            app:ringColor="@color/colorAccent"
+            app:ringWidth="0.5"
+            app:showIndicator="true"
+            app:showInnerCircle="true"
+            app:showProgressText="true"
+            app:speedMultiplier="2">
+
+        </com.akaita.android.circularseekbar.CircularSeekBar>
+        <com.akaita.android.circularseekbar.CircularSeekBar
+            android:layout_width="90dp"
+            android:layout_height="100dp"
+            android:id="@+id/seekbarSustain"
+            app:enabled="true"
+            app:innerCircleColor="#e0f7e9"
+            app:min="0"
+            app:max="10"
+            app:progress="15"
+            app:progressTextColor="@android:color/black"
+            app:progressTextSize="15"
+            app:ringColor="@color/colorAccent"
+            app:ringWidth="0.7"
+            app:showIndicator="true"
+            app:showInnerCircle="true"
+            app:showProgressText="true"
+            app:speedMultiplier="2">
+
+        </com.akaita.android.circularseekbar.CircularSeekBar>
+        <com.akaita.android.circularseekbar.CircularSeekBar
+            android:layout_width="90dp"
+            android:layout_height="100dp"
+            android:id="@+id/seekbarRelease"
+            app:enabled="true"
+            app:innerCircleColor="#e0f7e9"
+            app:min="0"
+            app:max="100"
+            app:progress="15"
+            app:progressTextColor="@android:color/black"
+            app:progressTextSize="15"
+            app:ringColor="@color/colorAccent"
+            app:ringWidth="0.5"
+            app:showIndicator="true"
+            app:showInnerCircle="true"
+            app:showProgressText="true"
+            app:speedMultiplier="5">
+
+        </com.akaita.android.circularseekbar.CircularSeekBar>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.example.prueba;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -13,6 +14,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 
+import com.akaita.android.circularseekbar.CircularSeekBar;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 
@@ -39,6 +44,41 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         construyeSpinner();
+        final CircularSeekBar seekbar = findViewById(R.id.seekbarAttack);
+        seekbar.setProgressTextFormat(new DecimalFormat("###,###,###,##0.000"));
+        seekbar.setProgress(0);
+        seekbar.setRingColor(Color.GREEN);
+        seekbar.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
+            @Override
+            public void onCenterClicked(CircularSeekBar seekBar, float progress) {
+                Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
+
+            }
+        });
+        seekbar.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
+                if (progress<20)
+                    seekbar.setRingColor(Color.GREEN);
+
+                    else if (progress<40)
+                    seekbar.setRingColor(Color.YELLOW);
+
+                else
+                            seekbar.setRingColor(Color.RED);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(CircularSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(CircularSeekBar seekBar) {
+
+            }
+        });
         puntosEnvolvente.add(new Pair<Double, Double>(0.0,0.0));
         puntosEnvolvente.add(new Pair<Double, Double>(0.05,0.9));
         puntosEnvolvente.add(new Pair<Double, Double>(0.1,0.3));
