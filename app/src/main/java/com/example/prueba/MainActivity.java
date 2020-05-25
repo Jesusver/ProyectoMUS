@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.akaita.android.circularseekbar.CircularSeekBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -24,14 +25,21 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
     // originally from http://marblemice.blogspot.com/2010/04/generate-and-play-tone-in-android.html
     // and modified by Steve Pomeroy <steve@staticfree.info>
-    private final int duration = 5; // seconds
+    private final int duration = 4; // seconds
     private final int sampleRate = 44100;
     private final int numSamples = duration * sampleRate;
     private final double sample[] = new double[numSamples];
     private double freqOfTone; // hz
+    private CircularSeekBarPropia seekBarAttack;
+    private CircularSeekBarPropia seekBarDecay;
+    private CircularSeekBarPropia seekBarSustain;
+    private CircularSeekBarPropia seekBarRelease;
+
     private short CHUNK = 32767;
     private Octavas octavaNotas;
-    private ArrayList<Pair<Double, Double>> puntosEnvolvente = new ArrayList<>();
+    private final DecimalFormat FORMAT = new DecimalFormat("#.###");
+
+    private ArrayList<Pair<Float, Float>> puntosEnvolvente = new ArrayList<>();
     private double last;
     private float[] envSamples;
 
@@ -44,28 +52,141 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         construyeSpinner();
-        final CircularSeekBar seekbar = findViewById(R.id.seekbarAttack);
-        seekbar.setProgressTextFormat(new DecimalFormat("###,###,###,##0.000"));
-        seekbar.setProgress(0);
-        seekbar.setRingColor(Color.GREEN);
-        seekbar.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
+
+        seekBarAttack = findViewById(R.id.seekbarAttack);
+        seekBarDecay = findViewById(R.id.seekbarDecay);
+        seekBarSustain = findViewById(R.id.seekbarSustain);
+        seekBarRelease = findViewById(R.id.seekbarRelease);
+        inicializaSeekBars();
+        puntosEnvolvente.add(new Pair<>(new Float(0.0), new Float(0.0)));
+        puntosEnvolvente.add(new Pair<>(new Float(0.05), new Float(0.9)));
+        puntosEnvolvente.add(new Pair<>(new Float(0.1), new Float(0.3)));
+        puntosEnvolvente.add(new Pair<>(new Float(2.6), new Float(0.2)));
+        puntosEnvolvente.add(new Pair<>(new Float(4.3), new Float(0.0)));
+        last=puntosEnvolvente.size()-1;
+        envSamples = env();
+    }
+
+    private void inicializaSeekBars() {
+        inicializaAttackbar();
+        inicializaDecaybar();
+        inicializaSustainbar();
+        inicializaReleasebar();
+
+    }
+
+    private void inicializaAttackbar() {
+        ((TextView)findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBarAttack.getProgress()) + "ms");
+
+        seekBarAttack.setRingColor(Color.BLUE);
+        seekBarAttack.setMax((float) 0.5);
+        seekBarAttack.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
+            @Override
+            public void onCenterClicked(CircularSeekBar seekBar, float progress) {
+                Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+        seekBarAttack.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
+                ((TextView)findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
+                puntosEnvolvente.remove(1);
+                puntosEnvolvente.add(1, new Pair<>(progress, new Float(0.9)));
+            }
+
+            @Override
+            public void onStartTrackingTouch(CircularSeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(CircularSeekBar seekBar) {
+                seekBarDecay.setMin(seekBar.getProgress(), seekBarDecay.getProgress());
+
+            }
+        });
+
+    }
+
+    private void inicializaDecaybar() {
+        seekBarDecay.setMax((float) 1.5);
+        ((TextView)findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBarDecay.getProgress()) + "ms");
+
+        seekBarDecay.setRingColor(Color.BLUE);
+        seekBarDecay.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
+            @Override
+            public void onCenterClicked(CircularSeekBar seekBar, float progress) {
+                Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+        seekBarDecay.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
+                ((TextView)findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
+                puntosEnvolvente.remove(2);
+                puntosEnvolvente.add(2, new Pair<>(progress, new Float(0.3)));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(CircularSeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(CircularSeekBar seekBar) {
+                seekBarSustain.setMin(seekBar.getProgress(), seekBarSustain.getProgress());
+
+            }
+        });
+    }
+
+    private void inicializaSustainbar() {
+        seekBarSustain.setMax((float) 3.5);
+        ((TextView)findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBarSustain.getProgress()) + "ms");
+        seekBarSustain.setRingColor(Color.BLUE);
+        seekBarSustain.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
             @Override
             public void onCenterClicked(CircularSeekBar seekBar, float progress) {
                 Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
 
             }
         });
-        seekbar.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
+        seekBarSustain.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
-                if (progress<20)
-                    seekbar.setRingColor(Color.GREEN);
+                ((TextView)findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
+                puntosEnvolvente.remove(3);
+                puntosEnvolvente.add(3, new Pair<>(progress, new Float(0.2)));
 
-                    else if (progress<40)
-                    seekbar.setRingColor(Color.YELLOW);
+            }
 
-                else
-                            seekbar.setRingColor(Color.RED);
+            @Override
+            public void onStartTrackingTouch(CircularSeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(CircularSeekBar seekBar) {
+                seekBarRelease.setMin(seekBar.getProgress(), seekBarRelease.getProgress());
+            }
+        });
+    }
+
+
+
+    private void inicializaReleasebar() {
+        seekBarRelease.setRingColor(Color.BLUE);
+        seekBarRelease.setMax(4);
+        ((TextView)findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBarRelease.getProgress()) + "ms");
+
+        seekBarRelease.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
+            @Override
+            public void onCenterClicked(CircularSeekBar seekBar, float progress) {
+                Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
+
+            }
+        });
+        seekBarRelease.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
+                ((TextView)findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
+                puntosEnvolvente.remove(4);
+                puntosEnvolvente.add(4, new Pair<>(progress, new Float(0.0)));
 
             }
 
@@ -79,16 +200,8 @@ public class MainActivity extends Activity {
 
             }
         });
-        puntosEnvolvente.add(new Pair<Double, Double>(0.0,0.0));
-        puntosEnvolvente.add(new Pair<Double, Double>(0.05,0.9));
-        puntosEnvolvente.add(new Pair<Double, Double>(0.1,0.3));
-        puntosEnvolvente.add(new Pair<Double, Double>(2.6,0.2));
-        puntosEnvolvente.add(new Pair<Double, Double>(4.3,0.0));
-        last=puntosEnvolvente.size()-1;
-        envSamples = env();
-
-
     }
+
 
     private void construyeSpinner() {
         Spinner s = findViewById(R.id.spinnerOctavas);
