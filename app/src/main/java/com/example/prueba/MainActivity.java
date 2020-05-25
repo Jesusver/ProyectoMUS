@@ -59,12 +59,11 @@ public class MainActivity extends Activity {
         seekBarRelease = findViewById(R.id.seekbarRelease);
         inicializaSeekBars();
         puntosEnvolvente.add(new Pair<>(new Float(0.0), new Float(0.0)));
-        puntosEnvolvente.add(new Pair<>(new Float(0.05), new Float(0.9)));
-        puntosEnvolvente.add(new Pair<>(new Float(0.1), new Float(0.3)));
-        puntosEnvolvente.add(new Pair<>(new Float(2.6), new Float(0.2)));
-        puntosEnvolvente.add(new Pair<>(new Float(4.3), new Float(0.0)));
+        puntosEnvolvente.add(new Pair<>(new Float(seekBarAttack.getProgress()), new Float(0.9)));
+        puntosEnvolvente.add(new Pair<>(new Float(seekBarDecay.getProgress()), new Float(0.3)));
+        puntosEnvolvente.add(new Pair<>(new Float(seekBarSustain.getProgress()), new Float(0.2)));
+        puntosEnvolvente.add(new Pair<>(new Float(seekBarRelease.getProgress()), new Float(0.0)));
         last=puntosEnvolvente.size()-1;
-        envSamples = env();
     }
 
     private void inicializaSeekBars() {
@@ -337,6 +336,7 @@ public class MainActivity extends Activity {
 
     public void suena(View view) {
         // Use a new tread as this can take a while
+        envSamples = env();
         final Thread thread = new Thread(new Runnable() {
             public void run() {
                 genTone();
@@ -403,7 +403,7 @@ public class MainActivity extends Activity {
     }
 
     private float[] env(){
-        last = puntosEnvolvente.get(puntosEnvolvente.size()-1).first*sampleRate;
+        last = duration*sampleRate;
         last = last+CHUNK;
         float[] resul = new float[(int)last];
 
