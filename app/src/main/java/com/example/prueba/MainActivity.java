@@ -256,24 +256,22 @@ public class MainActivity extends Activity {
                 AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
                 AudioTrack.MODE_STATIC);
         audioTrack.write(generatedSnd, 0, generatedSnd.length);
-        audioTrack.play();
-        audioTrack.setNotificationMarkerPosition(duration * sampleRate);
-        audioTrack.setNotificationMarkerPosition(audioTrack.getPlaybackHeadPosition() + (duration * sampleRate));
-        audioTrack.setPlaybackPositionUpdateListener(new AudioTrack.OnPlaybackPositionUpdateListener(){
-
-            @Override
-            public void onMarkerReached(AudioTrack arg0) {
-                audioTrack.release();
-
-            }
-
-            @Override
-            public void onPeriodicNotification(AudioTrack arg0) {
-
-            }
-
+        if(audioTrack.getState()==AudioTrack.STATE_INITIALIZED) {
+            audioTrack.play();
+            audioTrack.setNotificationMarkerPosition(duration * sampleRate);
+            audioTrack.setNotificationMarkerPosition(audioTrack.getPlaybackHeadPosition() + (duration * sampleRate));
+            audioTrack.setPlaybackPositionUpdateListener(
+                    new AudioTrack.OnPlaybackPositionUpdateListener() {
+                         @Override
+                         public void onMarkerReached(AudioTrack arg0) {
+                             audioTrack.release();
+                         }
+                         @Override
+                         public void onPeriodicNotification(AudioTrack arg0) {
+                         }
+                    }
+            );
         }
-        );
 
         //while(audioTrack.getPlayState() != AudioTrack.PLAYSTATE_STOPPED) {}
 
