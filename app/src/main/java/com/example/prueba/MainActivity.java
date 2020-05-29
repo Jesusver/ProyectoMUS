@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
     private final int duration = 4; // seconds
     private final int sampleRate = 44100;
     private final int numSamples = duration * sampleRate;
-    private final double sample[] = new double[numSamples];
+    private double[] sample = new double[numSamples];
     private final double[] VOLUMENES = {0.3, 0.2, 0.15, 0.15, 0.1, 0.1};
     private double[] arms = new double[VOLUMENES.length];
     private double freqOfTone; // hz
@@ -338,6 +338,7 @@ public class MainActivity extends Activity {
 
     public void suena(View view) {
         // Use a new tread as this can take a while
+        sample = new double[numSamples];
         envSamples = env();
         final Thread thread = new Thread(new Runnable() {
             public void run() {
