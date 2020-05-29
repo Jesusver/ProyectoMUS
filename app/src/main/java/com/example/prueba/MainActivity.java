@@ -23,11 +23,6 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
-    // originally from http://marblemice.blogspot.com/2010/04/generate-and-play-tone-in-android.html
-    // and modified by Steve Pomeroy <steve@staticfree.info>
-
-
-
     private final int duration = 4; // seconds
     private final int sampleRate = 44100;
     private final int numSamples = duration * sampleRate;
@@ -39,56 +34,53 @@ public class MainActivity extends Activity {
     private CircularSeekBarPropia seekBarDecay;
     private CircularSeekBarPropia seekBarSustain;
     private CircularSeekBarPropia seekBarRelease;
-
     private short CHUNK = 32767;
     private Octavas octavaNotas;
     private final DecimalFormat FORMAT = new DecimalFormat("#.###");
-
     private ArrayList<Pair<Float, Float>> puntosEnvolvente = new ArrayList<>();
     private double last;
     private float[] envSamples;
-
     private final byte generatedSnd[] = new byte[2 * numSamples];
     private AudioTrack audioTrack;
-
-
-    Handler handler = new Handler();
+    private Handler handler = new Handler();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         construyeSpinner();
-
         seekBarAttack = findViewById(R.id.seekbarAttack);
         seekBarDecay = findViewById(R.id.seekbarDecay);
         seekBarSustain = findViewById(R.id.seekbarSustain);
         seekBarRelease = findViewById(R.id.seekbarRelease);
         inicializaSeekBars();
+
+        //Asigna valores a los puntos de envolvente
         puntosEnvolvente.add(new Pair<>(new Float(0.0), new Float(0.0)));
         puntosEnvolvente.add(new Pair<>(new Float(seekBarAttack.getProgress()), new Float(0.9)));
         puntosEnvolvente.add(new Pair<>(new Float(seekBarDecay.getProgress()), new Float(0.3)));
         puntosEnvolvente.add(new Pair<>(new Float(seekBarSustain.getProgress()), new Float(0.2)));
         puntosEnvolvente.add(new Pair<>(new Float(seekBarRelease.getProgress()), new Float(0.0)));
-        last=puntosEnvolvente.size()-1;
+
+        last = puntosEnvolvente.size() - 1;
     }
 
+    //Función que asigna a las SeekBars los parámetros que setean y sus mínimos y máximos
     private void inicializaSeekBars() {
         inicializaAttackbar();
         inicializaDecaybar();
         inicializaSustainbar();
         inicializaReleasebar();
-
     }
 
     private void inicializaAttackbar() {
-        ((TextView)findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBarAttack.getProgress()) + "ms");
+        ((TextView) findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBarAttack.getProgress()) + "ms");
         seekBarAttack.setMax((float) 0.5);
         seekBarAttack.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
-                ((TextView)findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
-                if (seekBarDecay.setMin((float)(seekBar.getProgress()+0.001), seekBarDecay.getProgress())){
+                ((TextView) findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
+                if (seekBarDecay.setMin((float) (seekBar.getProgress() + 0.001), seekBarDecay.getProgress())) {
                     puntosEnvolvente.remove(2);
                     puntosEnvolvente.add(2, new Pair<>(seekBarDecay.getProgress(), new Float(0.9)));
                 }
@@ -97,7 +89,8 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void onStartTrackingTouch(CircularSeekBar seekBar) { }
+            public void onStartTrackingTouch(CircularSeekBar seekBar) {
+            }
 
             @Override
             public void onStopTrackingTouch(CircularSeekBar seekBar) {
@@ -107,17 +100,15 @@ public class MainActivity extends Activity {
         });
 
     }
-
     private void inicializaDecaybar() {
         seekBarDecay.setMax((float) 1.5);
-        ((TextView)findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBarDecay.getProgress()) + "ms");
-
+        ((TextView) findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBarDecay.getProgress()) + "ms");
 
         seekBarDecay.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
-                ((TextView)findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
-                if (seekBarSustain.setMin((float)(seekBar.getProgress()+0.001), seekBarSustain.getProgress())){
+                ((TextView) findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
+                if (seekBarSustain.setMin((float) (seekBar.getProgress() + 0.001), seekBarSustain.getProgress())) {
                     puntosEnvolvente.remove(3);
                     puntosEnvolvente.add(3, new Pair<>(seekBarSustain.getProgress(), new Float(0.2)));
                 }
@@ -126,7 +117,8 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void onStartTrackingTouch(CircularSeekBar seekBar) { }
+            public void onStartTrackingTouch(CircularSeekBar seekBar) {
+            }
 
             @Override
             public void onStopTrackingTouch(CircularSeekBar seekBar) {
@@ -135,15 +127,14 @@ public class MainActivity extends Activity {
             }
         });
     }
-
     private void inicializaSustainbar() {
         seekBarSustain.setMax((float) 3.5);
-        ((TextView)findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBarSustain.getProgress()) + "ms");
+        ((TextView) findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBarSustain.getProgress()) + "ms");
         seekBarSustain.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
-                ((TextView)findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
-                if (seekBarRelease.setMin((float)(seekBar.getProgress()+0.001), seekBarRelease.getProgress())){
+                ((TextView) findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
+                if (seekBarRelease.setMin((float) (seekBar.getProgress() + 0.001), seekBarRelease.getProgress())) {
                     puntosEnvolvente.remove(4);
                     puntosEnvolvente.add(4, new Pair<>(seekBarRelease.getProgress(), new Float(0.0)));
                 }
@@ -152,7 +143,8 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void onStartTrackingTouch(CircularSeekBar seekBar) { }
+            public void onStartTrackingTouch(CircularSeekBar seekBar) {
+            }
 
             @Override
             public void onStopTrackingTouch(CircularSeekBar seekBar) {
@@ -160,16 +152,13 @@ public class MainActivity extends Activity {
             }
         });
     }
-
-
-
     private void inicializaReleasebar() {
         seekBarRelease.setMax(4);
-        ((TextView)findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBarRelease.getProgress()) + "ms");
+        ((TextView) findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBarRelease.getProgress()) + "ms");
         seekBarRelease.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
-                ((TextView)findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
+                ((TextView) findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBar.getProgress()) + "ms");
                 puntosEnvolvente.remove(4);
                 puntosEnvolvente.add(4, new Pair<>(seekBar.getProgress(), new Float(0.0)));
             }
@@ -196,7 +185,7 @@ public class MainActivity extends Activity {
         s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                octavaNotas = Octavas.devuelveOctavaPorNombre((String)parent.getItemAtPosition(position));
+                octavaNotas = Octavas.devuelveOctavaPorNombre((String) parent.getItemAtPosition(position));
                 actualizaBotones();
             }
 
@@ -207,12 +196,14 @@ public class MainActivity extends Activity {
         });
     }
 
+
+    //Función que asigna a los botones la frecuencia a devolver en función de la octava seleccionada
     private void actualizaBotones() {
         Button botonNota = findViewById(R.id.button);
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -220,7 +211,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -228,7 +219,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -236,7 +227,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -244,7 +235,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -252,7 +243,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -260,7 +251,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -268,7 +259,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -276,7 +267,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -284,7 +275,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -292,7 +283,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -300,7 +291,7 @@ public class MainActivity extends Activity {
         botonNota.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button)v).getText().toString()), octavaNotas.getNumero());
+                freqOfTone = GeneraNota.getInstance().devuelveFrecuenciaNota(Notas.devuelveNotaPorNombre(((Button) v).getText().toString()), octavaNotas.getNumero());
                 suena(v);
             }
         });
@@ -308,8 +299,9 @@ public class MainActivity extends Activity {
     }
 
     public void suena(View view) {
-        // Use a new tread as this can take a while
+        //Reinicializamos los samples para que no acumulen valores de otras reproducciones
         sample = new double[numSamples];
+        //Generamos los samples de envolvente
         envSamples = env();
         final Thread thread = new Thread(new Runnable() {
             public void run() {
@@ -326,18 +318,20 @@ public class MainActivity extends Activity {
 
     }
 
-    void genTone(){
-        // fill out the array
-        for (int i = 0; i < VOLUMENES.length; ++i){
-            arms[i] = freqOfTone*(i+1);
+    void genTone() {
+        //Rellenamos el array de valores de armónicos
+        for (int i = 0; i < VOLUMENES.length; ++i) {
+            arms[i] = freqOfTone * (i + 1);
         }
         for (int i = 0; i < numSamples; ++i) {
-           // sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfTone));
+            //Generamos el sample mediante síntesis aditiva
             for (int j = 0; j < VOLUMENES.length; ++j)
-                sample[i] += Math.sin(2 * Math.PI * i / (sampleRate/arms[j])) * VOLUMENES[j];
+                sample[i] += Math.sin(2 * Math.PI * i / (sampleRate / arms[j])) * VOLUMENES[j];
         }
+
+        //Aplicamos la envolvente al sample generado previamente
         for (int i = 0; i < numSamples; ++i) {
-            sample[i] = sample[i]*envSamples[i];
+            sample[i] = sample[i] * envSamples[i];
         }
 
 
@@ -354,25 +348,28 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void playSound(){
+    private void playSound() {
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                 sampleRate, AudioFormat.CHANNEL_OUT_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
                 AudioTrack.MODE_STATIC);
         audioTrack.write(generatedSnd, 0, generatedSnd.length);
-        if(audioTrack.getState()==AudioTrack.STATE_INITIALIZED) {
+
+        //Comprobamos que el audioTrack esté disponible antes de reproducir para no sobrecargar el dispositivo
+        if (audioTrack.getState() == AudioTrack.STATE_INITIALIZED) {
             audioTrack.play();
             audioTrack.setNotificationMarkerPosition(duration * sampleRate);
             audioTrack.setNotificationMarkerPosition(audioTrack.getPlaybackHeadPosition() + (duration * sampleRate));
             audioTrack.setPlaybackPositionUpdateListener(
                     new AudioTrack.OnPlaybackPositionUpdateListener() {
-                         @Override
-                         public void onMarkerReached(AudioTrack arg0) {
-                             audioTrack.release();
-                         }
-                         @Override
-                         public void onPeriodicNotification(AudioTrack arg0) {
-                         }
+                        @Override
+                        public void onMarkerReached(AudioTrack arg0) {
+                            audioTrack.release();
+                        }
+
+                        @Override
+                        public void onPeriodicNotification(AudioTrack arg0) {
+                        }
                     }
             );
         }
@@ -384,27 +381,23 @@ public class MainActivity extends Activity {
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
-    private float[] env(){
-        last = duration*sampleRate;
-        last = last+CHUNK;
-        float[] resul = new float[(int)last];
-
-        for(int i = 0; i<puntosEnvolvente.size()-1; i++){
-            int f1,f2;
-            double v1,v2;
-
-            f1 = (int) (puntosEnvolvente.get(i).first*sampleRate);
-            f2 = (int) (puntosEnvolvente.get(i+1).first*sampleRate);
-
+    //Funcion que genera los samples de envolventes según los valores de las SeekBar
+    private float[] env() {
+        last = duration * sampleRate;
+        last = last + CHUNK;
+        float[] samplesEnvolvente = new float[(int) last];
+        for (int i = 0; i < puntosEnvolvente.size() - 1; i++) {
+            int f1, f2;
+            double v1, v2;
+            f1 = (int) (puntosEnvolvente.get(i).first * sampleRate);
+            f2 = (int) (puntosEnvolvente.get(i + 1).first * sampleRate);
             v1 = puntosEnvolvente.get(i).second;
-            v2 = puntosEnvolvente.get(i+1).second;
-
-            for(int j= f1; j<f2; j++){
-
-                resul[j] = (float) (v1+(j-f1)*(v2-v1)/(f2-f1));
+            v2 = puntosEnvolvente.get(i + 1).second;
+            for (int j = f1; j < f2; j++) {
+                samplesEnvolvente[j] = (float) (v1 + (j - f1) * (v2 - v1) / (f2 - f1));
             }
         }
 
-        return resul;
+        return samplesEnvolvente;
     }
 }
