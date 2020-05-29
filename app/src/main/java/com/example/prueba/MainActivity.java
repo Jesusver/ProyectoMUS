@@ -29,6 +29,8 @@ public class MainActivity extends Activity {
     private final int sampleRate = 44100;
     private final int numSamples = duration * sampleRate;
     private final double sample[] = new double[numSamples];
+    private final double[] VOLUMENES = {0.3, 0.2, 0.15, 0.15, 0.1, 0.1};
+    private double[] arms = new double[VOLUMENES.length];
     private double freqOfTone; // hz
     private CircularSeekBarPropia seekBarAttack;
     private CircularSeekBarPropia seekBarDecay;
@@ -354,8 +356,13 @@ public class MainActivity extends Activity {
 
     void genTone(){
         // fill out the array
+        for (int i = 0; i < VOLUMENES.length; ++i){
+            arms[i] = freqOfTone*(i+1);
+        }
         for (int i = 0; i < numSamples; ++i) {
-            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfTone));
+           // sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfTone));
+            for (int j = 0; j < VOLUMENES.length; ++j)
+                sample[i] += Math.sin(2 * Math.PI * i / (sampleRate/arms[j])) * VOLUMENES[j];
         }
         for (int i = 0; i < numSamples; ++i) {
             sample[i] = sample[i]*envSamples[i];
