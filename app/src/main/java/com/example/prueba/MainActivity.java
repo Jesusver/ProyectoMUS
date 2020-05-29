@@ -25,6 +25,9 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
     // originally from http://marblemice.blogspot.com/2010/04/generate-and-play-tone-in-android.html
     // and modified by Steve Pomeroy <steve@staticfree.info>
+
+
+
     private final int duration = 4; // seconds
     private final int sampleRate = 44100;
     private final int numSamples = duration * sampleRate;
@@ -46,6 +49,8 @@ public class MainActivity extends Activity {
     private float[] envSamples;
 
     private final byte generatedSnd[] = new byte[2 * numSamples];
+    private AudioTrack audioTrack;
+
 
     Handler handler = new Handler();
 
@@ -78,15 +83,7 @@ public class MainActivity extends Activity {
 
     private void inicializaAttackbar() {
         ((TextView)findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBarAttack.getProgress()) + "ms");
-
-        seekBarAttack.setRingColor(Color.BLUE);
         seekBarAttack.setMax((float) 0.5);
-        seekBarAttack.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
-            @Override
-            public void onCenterClicked(CircularSeekBar seekBar, float progress) {
-                Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
-            }
-        });
         seekBarAttack.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
@@ -115,13 +112,7 @@ public class MainActivity extends Activity {
         seekBarDecay.setMax((float) 1.5);
         ((TextView)findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBarDecay.getProgress()) + "ms");
 
-        seekBarDecay.setRingColor(Color.BLUE);
-        seekBarDecay.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
-            @Override
-            public void onCenterClicked(CircularSeekBar seekBar, float progress) {
-                Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
-            }
-        });
+
         seekBarDecay.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
@@ -148,14 +139,6 @@ public class MainActivity extends Activity {
     private void inicializaSustainbar() {
         seekBarSustain.setMax((float) 3.5);
         ((TextView)findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBarSustain.getProgress()) + "ms");
-        seekBarSustain.setRingColor(Color.BLUE);
-        seekBarSustain.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
-            @Override
-            public void onCenterClicked(CircularSeekBar seekBar, float progress) {
-                Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
-
-            }
-        });
         seekBarSustain.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
@@ -181,17 +164,8 @@ public class MainActivity extends Activity {
 
 
     private void inicializaReleasebar() {
-        seekBarRelease.setRingColor(Color.BLUE);
         seekBarRelease.setMax(4);
         ((TextView)findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBarRelease.getProgress()) + "ms");
-
-        seekBarRelease.setOnCenterClickedListener(new CircularSeekBar.OnCenterClickedListener() {
-            @Override
-            public void onCenterClicked(CircularSeekBar seekBar, float progress) {
-                Snackbar.make(seekBar, "reset", Snackbar.LENGTH_SHORT).show();
-
-            }
-        });
         seekBarRelease.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
@@ -380,8 +354,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    void playSound(){
-        final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+    private void playSound(){
+        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                 sampleRate, AudioFormat.CHANNEL_OUT_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
                 AudioTrack.MODE_STATIC);
@@ -402,9 +376,12 @@ public class MainActivity extends Activity {
                     }
             );
         }
+    }
 
-        //while(audioTrack.getPlayState() != AudioTrack.PLAYSTATE_STOPPED) {}
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     private float[] env(){
