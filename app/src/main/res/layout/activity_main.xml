@@ -267,7 +267,7 @@
                 app:innerCircleColor="#e0f7e9"
                 app:max="1.5"
                 app:min="0.5"
-                app:progress="0.1"
+                app:progress="1"
                 app:ringColor="@color/md_blue_500"
                 app:ringWidth="0.7"
                 app:showIndicator="true"

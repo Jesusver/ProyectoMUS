@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -301,6 +302,7 @@ public class MainActivity extends Activity {
     public void suena(View view) {
         //Reinicializamos los samples para que no acumulen valores de otras reproducciones
         sample = new double[numSamples];
+        deshabilitaInterfaz();
         //Generamos los samples de envolvente
         envSamples = env();
         final Thread thread = new Thread(new Runnable() {
@@ -316,6 +318,28 @@ public class MainActivity extends Activity {
         });
         thread.start();
 
+    }
+
+    private void deshabilitaInterfaz() {
+        LinearLayout linearGeneral = findViewById(R.id.linearLayout);
+        for (int i = 0; i < linearGeneral.getChildCount(); i++){
+            LinearLayout linearParbotones = (LinearLayout) linearGeneral.getChildAt(i);
+            for (int j = 0; j < linearParbotones.getChildCount(); j++){
+                linearParbotones.getChildAt(j).setEnabled(false);
+            }
+        }
+        findViewById(R.id.spinnerOctavas).setEnabled(false);
+    }
+
+    private void habilitaInterfaz() {
+        LinearLayout linearGeneral = findViewById(R.id.linearLayout);
+        for (int i = 0; i < linearGeneral.getChildCount(); i++){
+            LinearLayout linearParbotones = (LinearLayout) linearGeneral.getChildAt(i);
+            for (int j = 0; j < linearParbotones.getChildCount(); j++){
+                linearParbotones.getChildAt(j).setEnabled(true);
+            }
+        }
+        findViewById(R.id.spinnerOctavas).setEnabled(true);
     }
 
     void genTone() {
@@ -365,6 +389,7 @@ public class MainActivity extends Activity {
                         @Override
                         public void onMarkerReached(AudioTrack arg0) {
                             audioTrack.release();
+                            habilitaInterfaz();
                         }
 
                         @Override
@@ -374,6 +399,8 @@ public class MainActivity extends Activity {
             );
         }
     }
+
+
 
     @Override
     public void onStop() {
