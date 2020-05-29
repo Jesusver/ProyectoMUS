@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
     private double last;
     private float[] envSamples;
     private final byte generatedSnd[] = new byte[2 * numSamples];
-    private AudioTrack audioTrack;
+
     private Handler handler = new Handler();
 
     @Override
@@ -349,7 +349,7 @@ public class MainActivity extends Activity {
     }
 
     private void playSound() {
-        audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+        final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                 sampleRate, AudioFormat.CHANNEL_OUT_MONO,
                 AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
                 AudioTrack.MODE_STATIC);
