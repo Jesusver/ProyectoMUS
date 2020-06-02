@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-           android:gravity="center"/>
+            android:gravity="center" />
     </LinearLayout>
 
     <LinearLayout
@@ -190,23 +190,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="15dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginBottom="10dp"
+        android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_weight="1"
+            android:gravity="center"
             android:orientation="vertical">
 
             <TextView
@@ -215,6 +215,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="ATTACK"
+                android:textColor="@color/colorRuedas"
                 android:textStyle="bold" />
 
             <com.example.prueba.CircularSeekBarPropia
@@ -238,17 +239,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text=""/>
+                android:text=""
+                android:textColor="@color/colorRuedas" />
 
         </LinearLayout>
-
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_weight="1"
+            android:gravity="center"
             android:orientation="vertical">
 
             <TextView
@@ -257,6 +258,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="DECAY"
+                android:textColor="@color/colorRuedas"
                 android:textStyle="bold" />
 
             <com.example.prueba.CircularSeekBarPropia
@@ -280,9 +282,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text=""/>
+                android:text=""
+                android:textColor="@color/colorRuedas" />
 
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -296,6 +300,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="SUSTAIN"
+                android:textColor="@color/colorRuedas"
                 android:textStyle="bold" />
 
             <com.example.prueba.CircularSeekBarPropia
@@ -319,9 +324,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text=""/>
+                android:text=""
+                android:textColor="@color/colorRuedas" />
 
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -335,6 +342,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="RELEASE"
+                android:textColor="@color/colorRuedas"
                 android:textStyle="bold" />
 
             <com.example.prueba.CircularSeekBarPropia
@@ -358,9 +366,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text=""/>
+                android:text=""
+                android:textColor="@color/colorRuedas" />
 
         </LinearLayout>
     </LinearLayout>
+
+    <Switch
+        android:id="@+id/switch2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="cambiaGeneracion"
+        android:text="Aditiva/Karplus-Strong"
+        android:textColor="@color/colorRuedas"
+        app:layout_constraintBottom_toTopOf="@+id/LinearDesplegableOctavas"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Titulo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

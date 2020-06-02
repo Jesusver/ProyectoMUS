@@ -1,5 +1,6 @@
 package com.example.prueba;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Color;
 import android.media.AudioFormat;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.akaita.android.circularseekbar.CircularSeekBar;
@@ -21,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class MainActivity extends Activity {
@@ -36,6 +39,7 @@ public class MainActivity extends Activity {
     private CircularSeekBarPropia seekBarSustain;
     private CircularSeekBarPropia seekBarRelease;
     private short CHUNK = 32767;
+    private boolean karplus = false;
     private Octavas octavaNotas;
     private final DecimalFormat FORMAT = new DecimalFormat("#.###");
     private ArrayList<Pair<Float, Float>> puntosEnvolvente = new ArrayList<>();
@@ -101,6 +105,7 @@ public class MainActivity extends Activity {
         });
 
     }
+
     private void inicializaDecaybar() {
         seekBarDecay.setMax((float) 1.5);
         ((TextView) findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBarDecay.getProgress()) + "ms");
@@ -128,6 +133,7 @@ public class MainActivity extends Activity {
             }
         });
     }
+
     private void inicializaSustainbar() {
         seekBarSustain.setMax((float) 3.5);
         ((TextView) findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBarSustain.getProgress()) + "ms");
@@ -153,6 +159,7 @@ public class MainActivity extends Activity {
             }
         });
     }
+
     private void inicializaReleasebar() {
         seekBarRelease.setMax(4);
         ((TextView) findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBarRelease.getProgress()) + "ms");
@@ -307,7 +314,10 @@ public class MainActivity extends Activity {
         envSamples = env();
         final Thread thread = new Thread(new Runnable() {
             public void run() {
-                genTone();
+                if (!karplus)
+                    genTone();
+                else
+                    genToneKarplus();
                 handler.post(new Runnable() {
 
                     public void run() {
@@ -320,11 +330,15 @@ public class MainActivity extends Activity {
 
     }
 
+    public void cambiaGeneracion(View view) {
+        karplus = ((Switch) view).isChecked();
+    }
+
     private void deshabilitaInterfaz() {
         LinearLayout linearGeneral = findViewById(R.id.linearLayout);
-        for (int i = 0; i < linearGeneral.getChildCount(); i++){
+        for (int i = 0; i < linearGeneral.getChildCount(); i++) {
             LinearLayout linearParbotones = (LinearLayout) linearGeneral.getChildAt(i);
-            for (int j = 0; j < linearParbotones.getChildCount(); j++){
+            for (int j = 0; j < linearParbotones.getChildCount(); j++) {
                 linearParbotones.getChildAt(j).setEnabled(false);
             }
         }
@@ -333,13 +347,55 @@ public class MainActivity extends Activity {
 
     private void habilitaInterfaz() {
         LinearLayout linearGeneral = findViewById(R.id.linearLayout);
-        for (int i = 0; i < linearGeneral.getChildCount(); i++){
+        for (int i = 0; i < linearGeneral.getChildCount(); i++) {
             LinearLayout linearParbotones = (LinearLayout) linearGeneral.getChildAt(i);
-            for (int j = 0; j < linearParbotones.getChildCount(); j++){
+            for (int j = 0; j < linearParbotones.getChildCount(); j++) {
                 linearParbotones.getChildAt(j).setEnabled(true);
             }
         }
         findViewById(R.id.spinnerOctavas).setEnabled(true);
+    }
+
+    @SuppressLint("NewApi")
+    private void genToneKarplus() {
+
+        double waveTable[] = new double[Math.floorDiv(sampleRate, (int) freqOfTone)];
+        Random random = new Random();
+        for (int i = 0; i < waveTable.length; i++) {
+            waveTable[i] = 2 * random.nextInt(2) - 1;
+        }
+        sample = karplus_strong(waveTable);
+
+        //Aplicamos la envolvente al sample generado previamente
+        for (int i = 0; i < numSamples; ++i) {
+            //Aumentamos la amplitud de la señal para subir el volumen
+            sample[i] *= 4;
+            sample[i] = sample[i] * envSamples[i];
+        }
+
+        int idx = 0;
+        for (final double dVal : sample) {
+            // scale to maximum amplitude
+            final short val = (short) ((dVal * CHUNK));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+
+        }
+    }
+
+    private double[] karplus_strong(double[] wavetable) {
+        double[] retorno = new double[numSamples];
+        int current_sample = 0;
+        double previous_value = 0;
+        for (int i = 0; i < numSamples; i++) {
+            wavetable[current_sample] = (0.5 * (wavetable[current_sample] + previous_value));
+            retorno[i] = wavetable[current_sample];
+            current_sample += 1;
+            previous_value = retorno[i];
+            current_sample = current_sample % wavetable.length;
+        }
+        return retorno;
     }
 
     void genTone() {
@@ -401,7 +457,6 @@ public class MainActivity extends Activity {
     }
 
 
-
     @Override
     public void onStop() {
         super.onStop();
@@ -427,4 +482,18 @@ public class MainActivity extends Activity {
 
         return samplesEnvolvente;
     }
+
+
+
+
+   /* private float[] syntWaveTable(float[] waveTable, int frame){
+        float [] retorno = new float[CHUNK];
+        int t = frame;
+        for (int i = 0; i < CHUNK; i++){
+            retorno[i] = waveTable[t];
+            t = (t+1) % waveTable.length;
+        }
+        return retorno;
+
+    }*/
 }
