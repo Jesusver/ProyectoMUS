@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
     private CircularSeekBarPropia seekBarDecay;
     private CircularSeekBarPropia seekBarSustain;
     private CircularSeekBarPropia seekBarRelease;
-    private short CHUNK = 32767;
+    private final short MAX_AMPLITUD = 32767;
     private boolean karplus = false;
     private Octavas octavaNotas;
     private final DecimalFormat FORMAT = new DecimalFormat("#.###");
@@ -382,7 +382,7 @@ public class MainActivity extends Activity {
         int idx = 0;
         for (final double dVal : sample) {
             // scale to maximum amplitude
-            final short val = (short) ((dVal * CHUNK));
+            final short val = (short) ((dVal * MAX_AMPLITUD));
             // in 16 bit wav PCM, first byte is the low order byte
             generatedSnd[idx++] = (byte) (val & 0x00ff);
             generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
@@ -426,7 +426,7 @@ public class MainActivity extends Activity {
         int idx = 0;
         for (final double dVal : sample) {
             // scale to maximum amplitude
-            final short val = (short) ((dVal * CHUNK));
+            final short val = (short) ((dVal * MAX_AMPLITUD));
             // in 16 bit wav PCM, first byte is the low order byte
             generatedSnd[idx++] = (byte) (val & 0x00ff);
             generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
@@ -471,8 +471,7 @@ public class MainActivity extends Activity {
 
     //Funcion que genera los samples de envolventes según los valores de las SeekBar
     private float[] env() {
-        last = duration * sampleRate;
-        last = last + CHUNK;
+        last = duration * sampleRate + 1;
         float[] samplesEnvolvente = new float[(int) last];
         for (int i = 0; i < puntosEnvolvente.size() - 1; i++) {
             int f1, f2;
