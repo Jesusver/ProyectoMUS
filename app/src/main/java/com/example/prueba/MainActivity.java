@@ -2,7 +2,6 @@ package com.example.prueba;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -19,7 +18,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.akaita.android.circularseekbar.CircularSeekBar;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ import java.util.Random;
 
 
 public class MainActivity extends Activity {
-    private final int duration = 4; // seconds
+    private final int duration = 3; // seconds
     private final int sampleRate = 44100;
     private final int numSamples = duration * sampleRate;
     private double[] sample = new double[numSamples];
@@ -46,7 +44,6 @@ public class MainActivity extends Activity {
     private double last;
     private float[] envSamples;
     private final byte generatedSnd[] = new byte[2 * numSamples];
-
     private Handler handler = new Handler();
 
     @Override
@@ -80,7 +77,7 @@ public class MainActivity extends Activity {
 
     private void inicializaAttackbar() {
         ((TextView) findViewById(R.id.valorAttack)).setText(FORMAT.format(seekBarAttack.getProgress()) + "ms");
-        seekBarAttack.setMax((float) 0.5);
+        seekBarAttack.setMax((float) 0.3);
         seekBarAttack.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircularSeekBar seekBar, float progress, boolean fromUser) {
@@ -107,7 +104,7 @@ public class MainActivity extends Activity {
     }
 
     private void inicializaDecaybar() {
-        seekBarDecay.setMax((float) 1.5);
+        seekBarDecay.setMax((float) 1);
         ((TextView) findViewById(R.id.valorDecay)).setText(FORMAT.format(seekBarDecay.getProgress()) + "ms");
 
         seekBarDecay.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
@@ -135,7 +132,7 @@ public class MainActivity extends Activity {
     }
 
     private void inicializaSustainbar() {
-        seekBarSustain.setMax((float) 3.5);
+        seekBarSustain.setMax((float) 2);
         ((TextView) findViewById(R.id.valorSustain)).setText(FORMAT.format(seekBarSustain.getProgress()) + "ms");
         seekBarSustain.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
@@ -161,7 +158,7 @@ public class MainActivity extends Activity {
     }
 
     private void inicializaReleasebar() {
-        seekBarRelease.setMax(4);
+        seekBarRelease.setMax(3);
         ((TextView) findViewById(R.id.valorRelease)).setText(FORMAT.format(seekBarRelease.getProgress()) + "ms");
         seekBarRelease.setOnCircularSeekBarChangeListener(new CircularSeekBar.OnCircularSeekBarChangeListener() {
             @Override
@@ -190,6 +187,7 @@ public class MainActivity extends Activity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_item, octavas);
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         s.setAdapter(adapter);
+        s.setSelection(2);
         s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -343,6 +341,10 @@ public class MainActivity extends Activity {
             }
         }
         findViewById(R.id.spinnerOctavas).setEnabled(false);
+        seekBarAttack.setEnabled(false);
+        seekBarDecay.setEnabled(false);
+        seekBarRelease.setEnabled(false);
+        seekBarSustain.setEnabled(false);
     }
 
     private void habilitaInterfaz() {
@@ -354,6 +356,10 @@ public class MainActivity extends Activity {
             }
         }
         findViewById(R.id.spinnerOctavas).setEnabled(true);
+        seekBarAttack.setEnabled(true);
+        seekBarDecay.setEnabled(true);
+        seekBarRelease.setEnabled(true);
+        seekBarSustain.setEnabled(true);
     }
 
     @SuppressLint("NewApi")
@@ -369,7 +375,7 @@ public class MainActivity extends Activity {
         //Aplicamos la envolvente al sample generado previamente
         for (int i = 0; i < numSamples; ++i) {
             //Aumentamos la amplitud de la señal para subir el volumen
-            sample[i] *= 4;
+            sample[i] *= 2;
             sample[i] = sample[i] * envSamples[i];
         }
 
@@ -486,14 +492,4 @@ public class MainActivity extends Activity {
 
 
 
-   /* private float[] syntWaveTable(float[] waveTable, int frame){
-        float [] retorno = new float[CHUNK];
-        int t = frame;
-        for (int i = 0; i < CHUNK; i++){
-            retorno[i] = waveTable[t];
-            t = (t+1) % waveTable.length;
-        }
-        return retorno;
-
-    }*/
 }

@@ -4,7 +4,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public enum Octavas {
-    Primera("Primera", 1),
     Segunda("Segunda", 2),
     Tercera("Tercera", 3),
     Cuarta("Cuarta", 4),
